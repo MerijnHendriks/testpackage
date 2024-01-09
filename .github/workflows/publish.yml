@@ -31,7 +31,4 @@ jobs:
       run: dotnet pack --nologo --no-build  --configuration Release
 
     - name: Push package
-      run: |
-        foreach($file in (Get-ChildItem "${{ env.NuGetDirectory }}" -Recurse -Include *.nupkg)) {
-          dotnet nuget push $file --api-key ${{ secrets.TOKEN_PACKAGES }} --source "github" --skip-duplicate
-        }
+      run: dotnet nuget push bin/Release/*.nupkg --api-key ${{ secrets.TOKEN_PACKAGES }} --source "github" --skip-duplicate
