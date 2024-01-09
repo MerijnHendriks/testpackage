@@ -1,0 +1,36 @@
+name: nuget
+
+release:
+  types:
+    - published
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install sources
+      run: dotnet nuget add source --username merijnhendriks --password ${{ secrets.TOKEN_PACKAGES }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/merijnhendriks/index.json"
+
+    - name: Install dependencies
+      run: dotnet restore --configfile Nuget.config
+
+    - name: Build
+      run: dotnet build --nologo --no-restore --configuration Release
+
+    - name: Pack
+      run: dotnet pack --nologo --no-build  --configuration Release
+
+    - name: Push package
+      run: |
+        foreach($file in (Get-ChildItem "${{ env.NuGetDirectory }}" -Recurse -Include *.nupkg)) {
+          dotnet nuget push $file --api-key ${{ secrets.TOKEN_PACKAGES }} --source "github" --skip-duplicate
+        }

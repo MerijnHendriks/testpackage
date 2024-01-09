@@ -1,2 +1,3 @@
-# testpackage
-For testing github packages
+# Test package
+
+For testing github's nuget packages repo
